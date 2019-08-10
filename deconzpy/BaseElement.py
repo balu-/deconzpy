@@ -1,4 +1,16 @@
 class BaseElement:
+    """
+        BaseElement
+
+        Base Class for the Objects,
+        holds the functionaly handle subscribtions to attribute changes 
+
+        params:
+            id (str): object identifier
+            arr (dict): dictionary of values, might be stacked (like { "key": { "key1": "value" } } )
+                        internaly this dict will be converted to a dict of depth=1 (like { "key_key1": "value"})
+                        [this is done to be easily able to subscribe to changes]
+    """
     def __init__(self, id, arr):
         arr = self.__flatDict(arr)
         self.__val = arr
@@ -16,10 +28,9 @@ class BaseElement:
 
     def __flatDict(self, obj, preKey=""):
         """ 
-		convertiert ein dict mit verschiedenen unter dicts
-		in ein dict der tiefe 1
-		keys werden prependet: aus { "test" : { "test" : "value" }}
-							  wird { "test_test" : "value" }
+		converts a dict of multiple sub dicts to a dict of depth 1
+		keys will be prependet: input of  { "test" : { "test" : "value" }}
+							     will result in { "test_test" : "value" }
 		"""
         res = {}
         for key, value in obj.items():
@@ -35,6 +46,12 @@ class BaseElement:
         return res
 
     def update(self, obj):
+        """ 
+            update attributes and call subscribed liseners to inform about the change
+
+            Params:
+                obj (dict): attributes to change 
+        """
         obj = self.__flatDict(obj)
         updatedValues = {}
         # obj is an object with values
@@ -62,6 +79,16 @@ class BaseElement:
                     func(self, attributeName, oldvalue, self.__val[attributeName])
 
     def subscribeToAttribute(self, attributeName, func, callOnlyIfValueChanged=True):
+        """
+            Add subscriber for changes to an attribute
+
+            Param:
+                attributeName (str): name of the attribute to listen for changes
+                                    (!Note: this must be the 'flat_name' )
+                func (function): function that should be called on change
+                                (params will be: <BaseElement>, <attributeName>,<newValue>,<oldValue> )
+                callOnlyIfValueChanged (Bool): call func only if newValue != oldValue
+        """
         if not callOnlyIfValueChanged:  # subscribe to subsallwayscall
             if not attributeName in self.__subsAllwaysCall:
                 self.__subsAllwaysCall[attributeName] = []
@@ -74,6 +101,14 @@ class BaseElement:
                 self.__subs[attributeName].append(func)
 
     def unsubscribeFromAttribute(self, attributeName, func):
+        """ 
+            remove Subscriber from attribute
+
+            Param:
+                attributeName (str): name of the attribute to listen for changes
+                                    (!Note: this must be the 'flat_name' )
+                func (function): function that should be unsubscribed
+        """
         if attributeName in self.__subs:
             try:
                 self.__subs[attributeName].remove(func)
@@ -89,6 +124,12 @@ class BaseElement:
         return False
 
     def getAttribute(self, key):
+        """ 
+            get Attribute Value for key
+            Param:
+                key (str): name of the attribute 
+                            (!Note: this must be the 'flat_name' )
+        """
         if key in self.__val:
             return self.__val[key]
         else:
@@ -99,6 +140,12 @@ class BaseElement:
 
 
 class DeconzBaseElement(BaseElement):
+    """
+        DeconzBaseElement
+
+        adds urlRoot to the BaseElement
+        (urlRoot will be populated by the router on creation)
+    """
     def __init__(self, id, arr, urlRoot):
         self.__urlRoot = urlRoot
         BaseElement.__init__(self, id, arr)
@@ -106,11 +153,3 @@ class DeconzBaseElement(BaseElement):
     def getUrlRoot(self):
         return self.__urlRoot
 
-
-# Test
-if __name__ == "__main__":
-    b1 = BaseElement(1, {"test": {"tut": {"tat": "tit"}}})
-    if b1.getAttribute("test_tut_tat") != "tit":
-        print("Test fehlgeschlagen")
-    else:
-        print("Test erfolgreich")
