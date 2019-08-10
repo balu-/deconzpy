@@ -1,5 +1,6 @@
 # deconzpy
 [![Build Status](https://travis-ci.org/balu-/deconzpy.svg?branch=master)](https://travis-ci.org/balu-/deconzpy)
+[![Coverage Status](https://coveralls.io/repos/github/balu-/deconzpy/badge.svg?branch=master)](https://coveralls.io/github/balu-/deconzpy?branch=master)
 
 Homeautomation Library for the tech savvy (depending on zigbee/deconz-rest)
 
@@ -10,8 +11,8 @@ For example: on motion -> switch light on
 ### Sample Code
 
 ```python
-from deconzpy.Router import Router
-router = Router()
+from deconzpy import Router
+router = Router() # Router is a singelton, can be called in multiple places and will return the same Router Object
 ##
 # print some objects
 ##
