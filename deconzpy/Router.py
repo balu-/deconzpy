@@ -23,7 +23,10 @@ from .Config import Config
 
 
 class RouterConfig(Config):
-    # config
+    """
+        Config for the Router, 
+        mainly just ip of deconz and api token / username
+    """
     def __init__(self, file):
         Config.__init__(
             self, file, defaultConfig={"gatewayIP": "1.1.1.1", "username": "user"}
@@ -67,6 +70,17 @@ from threading import Thread
 
 
 class Router(Singleton):
+    """ Router
+
+        The heart and entrypoint of the lib,
+        a Singleton so the router exists only once but might be accessed from multiple places
+
+        Reads its config from "config.json"
+
+        (!Note to get and process update values from deconz the function "startAndRunThread" needs to be calld once,
+        this might be changed in the future so that its no longer needed)
+
+    """
     def __init__(self):
         print("ROUTER: INIT")
         self.__config = RouterConfig("config.json")
