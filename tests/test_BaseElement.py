@@ -36,7 +36,7 @@ class VaseElementTest(unittest.TestCase):
     	b1.update({"test":"1"})
     	m.assert_called_with(b1, 'test', '1', '1') # mock should  be called on same value
 
-    def test_unsubscribe_sameValue(self):
+    def test_unsubscribe(self):
     	m1 = Mock()
     	m2 = Mock()
     	m1.configure_mock(name='subscribeFunction')
@@ -50,6 +50,23 @@ class VaseElementTest(unittest.TestCase):
     	m1.assert_not_called() # mock should not be called on unsubscribe
     	m2.assert_not_called() # mock should not be called on unsubscribe
     	b1.update({"test":"2"})
+    	m1.assert_called() # mock should  be called on same value
+    	m2.assert_not_called() 
+
+    def test_unsubscribe_sameValue(self):
+    	m1 = Mock()
+    	m2 = Mock()
+    	m1.configure_mock(name='subscribeFunction')
+    	m2.configure_mock(name='unsubscribeFunction')
+    	b1 = BaseElement(1, {"test": "1"})
+    	b1.subscribeToAttribute('test',m1, callOnlyIfValueChanged=False)
+    	b1.subscribeToAttribute('test',m2, callOnlyIfValueChanged=False)
+    	m1.assert_not_called() # mock should not be called on subscribe
+    	m2.assert_not_called() # mock should not be called on subscribe
+    	b1.unsubscribeFromAttribute('test', m2)
+    	m1.assert_not_called() # mock should not be called on unsubscribe
+    	m2.assert_not_called() # mock should not be called on unsubscribe
+    	b1.update({"test":"1"})
     	m1.assert_called() # mock should  be called on same value
     	m2.assert_not_called() 
 
