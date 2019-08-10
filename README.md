@@ -7,7 +7,7 @@ For example: on motion -> switch light on
 
 ### Sample Code
 
-<code>
+```python
 from deconzpy.Router import Router
 router = Router()
 ##
@@ -31,5 +31,4 @@ def onMotion(sensor, key_that_changed, oldval, newval):
 	print("somebody moved - or stoped moving")
 
 bewegungsmelder[0].subscribeToAttribute("state_presence", onMotion)
-
-</code>
+```
