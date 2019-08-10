@@ -1,16 +1,16 @@
 
 from setuptools import setup, find_packages
-import pydeconz
+import deconzpy
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(
-    name="pydeconz",
-    version=pydeconz.__version__,
-    description=pydeconz.__doc__,
-    url=pydeconz.__url__,
-    author=pydeconz.__author__,
+    name="deconzpy",
+    version=deconzpy.__version__,
+    description=deconzpy.__doc__,
+    url=deconzpy.__url__,
+    author=deconzpy.__author__,
     long_description=long_description,
     long_description_content_type="text/markdown",
     classifiers=[

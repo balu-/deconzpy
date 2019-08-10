@@ -1,4 +1,4 @@
-# pydeconz
+# deconzpy
 Homeautomation Library for the tech savvy (depending on zigbee/deconz-rest)
 
 __This should be a library to easily build home automation scripts on top of the deconz-rest api__
@@ -8,7 +8,7 @@ For example: on motion -> switch light on
 ### Sample Code
 
 <code>
-from pydeconz.Router import Router
+from deconzpy.Router import Router
 router = Router()
 ##
 # print some objects
