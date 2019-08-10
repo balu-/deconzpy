@@ -86,7 +86,7 @@ class BaseElement:
                 attributeName (str): name of the attribute to listen for changes
                                     (!Note: this must be the 'flat_name' )
                 func (function): function that should be called on change
-                                (params will be: <BaseElement>, <attributeName>,<newValue>,<oldValue> )
+                                (params will be: <BaseElement>, <attributeName>,<oldValue>,<newValue> )
                 callOnlyIfValueChanged (Bool): call func only if newValue != oldValue
         """
         if not callOnlyIfValueChanged:  # subscribe to subsallwayscall
