@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-from deconzpy import BaseElement
+from deconzpy.BaseElement import BaseElement
 
 class VaseElementTest(unittest.TestCase):
     
