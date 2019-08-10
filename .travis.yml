@@ -1,0 +1,18 @@
+language: python
+python:
+- '3.5'
+- '3.6'
+- 3.6-dev
+- '3.7'
+install:
+- pip install -r requirements.txt
+- pip install -U pytest
+script:
+- python setup.py develop
+deploy:
+  provider: pypi
+  user: balu
+  password:
+    secure: i5ofFiOqXE1b/QHHgJU2qWZVM0zGgfY+Sko5DI2nOLS0TMaHWwccx+9ApbdAH1aHNXZDsfVjH1Au+udhGfS5qfkKuUWAlPgdNy+dUGsrsUJRlFvckvk2zgpKMMn4eOMBnNqT0gBwiBAYK/djaboL7iirrnZJunRNuaeCgolZA5TQgiNsTvbRqwvoYPsVwRgEYxgVIjXukkDadRD4YCCXxinmPwwpPlXD2y8ivReGRkYSYsTbXabRQlwxiQ5DaMzwKbFfz83cYfiMV3kk9e97ZIRvkKrI9nfhbe/bdJjJP6q2mUD0MGa/6fHI5GsLCrea2MwNu3L8rjMHLKXy0OoOSENeop3dzR9fb1mUcQl/6LqWIOxbR68Z1JZ2TotJi3rMn0/xDerS2WzKmrbicsuIyoKgxOHnZW9TvYABUUGwZ7tt8cXwkl78gV+khWdhZUfhULVicnIKZlGTp4q1GxA+guHKCAlbymu7XGEZA0k0fCqejvTS4trKBTL+Wp0Ur3IW2tn7aFWu6T6Bx3VqMZ80FHcjH9gV5kl2fXt5Apldt//rrDpPxZoGZcW/yAAp4Od3C3zbSgMrImKOBXOPx54QeO1MwgUGMR2H99Xpv16Di/HgvWW5hrgDhL5idxtJX8+iDkcP7KUj1F952KAgf58vfmSu4q2dVVc4Aqqw4aZoRL4=
+  on:
+    tags: true
