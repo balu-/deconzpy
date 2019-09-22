@@ -237,7 +237,7 @@ class Router(Singleton):
         else:
             print("obj not found, could not update state")
 
-    def __ws_on_message(self, ws, message):
+    def __ws_on_message(self, message):
         # print(message)
         try:
             obj = json.loads(message)
@@ -280,19 +280,22 @@ class Router(Singleton):
             print(obj)
             traceback.print_exc()
 
-    def __ws_on_error(self, ws, error):
+    def __ws_on_error(self, error):
         print("### error ###")
         print(error)
 
-    def __ws_on_close(self, ws):
+    def __ws_on_close(self):
         print("### closed ###")
 
-    def __ws_on_open(self, ws):
+    def __ws_on_open(self):
         print("### opened ###")
+        print(str(self))
+        #print(str(ws))
 
     def _ws_thread_entry(self):
         print("## THREAD RUNNING ##")
         websocket.enableTrace(False)
+        #websocket.enableTrace(True)
         wso = websocket.WebSocketApp(
             "ws://" + self.__config.get("gatewayIP") + ":443",
             on_message=self.__ws_on_message,
@@ -300,12 +303,14 @@ class Router(Singleton):
             on_close=self.__ws_on_close,
         )
         wso.on_open = self.__ws_on_open
+        print("## WS RUN forever ")
         wso.run_forever()
 
     def startAndRunThread(self):
         print("start & run thread")
-        self.__t = Thread(target=self._ws_thread_entry, args=())
-        self.__t.start()
+        self._t = Thread(target=self._ws_thread_entry, args=())
+        self._t.daemon = True
+        self._t.start()
         # _thread.start_new_thread( self._ws_thread_entry, ("Thread-1", 2, ) )
         # _thread.start_new_thread( self._ws_thread_entry, tuple() )
         # scheduler
@@ -313,6 +318,7 @@ class Router(Singleton):
         self.__schedulerThread = Thread(
             target=self.__runScheduler, args=(self.scheduler,)
         )
+        self.__schedulerThread.daemon = True
         self.__schedulerThread.start()
 
     def __runScheduler(self, sched):
