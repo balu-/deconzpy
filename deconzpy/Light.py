@@ -153,7 +153,7 @@ class Light(DeconzBaseElement):
                 self.getUrlRoot() + "/" + self.getId() + "/state", json=jsonObj
             )
         ##todo check if different from current setting
-        jsonObj = {"transitiontime": 10}
+        jsonObj = {} #{"transitiontime": 10}
         if (
             state.colorTemperatur >= 153
             and state.colorTemperatur <= 500
@@ -164,7 +164,7 @@ class Light(DeconzBaseElement):
             jsonObj["hue"] = state.hue
         if state.sat >= 0 and state.sat <= 255:
             jsonObj["sat"] = state.sat
-        if jsonObj != {"transitiontime": 10}:
+        if jsonObj != {} #{"transitiontime": 10}:
             # set colormode only if new color will be set
             if state.colormode != "":
                 jsonObj["colormode"] = state.colormode
@@ -182,7 +182,7 @@ class Light(DeconzBaseElement):
                 r = requests.put(
                     self.getUrlRoot() + "/" + self.getId() + "/state", json=jsonObj
                 )
-                jsonObj = {"transitiontime": 10}
+                jsonObj = {} #{"transitiontime": 10}
         if (
             state.brightness >= 0
             and state.brightness <= 255
@@ -194,7 +194,7 @@ class Light(DeconzBaseElement):
         if state.brightness == 0:
             jsonObj["on"] = False
             state.on = False
-        if jsonObj != {"transitiontime": 10}:
+        if jsonObj != {} #{"transitiontime": 10}:
             print(
                 "LIGHT "
                 + str(self.getId())
