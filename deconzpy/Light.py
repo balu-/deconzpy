@@ -164,7 +164,7 @@ class Light(DeconzBaseElement):
             jsonObj["hue"] = state.hue
         if state.sat >= 0 and state.sat <= 255:
             jsonObj["sat"] = state.sat
-        if jsonObj != {} #{"transitiontime": 10}:
+        if jsonObj != {}: #{"transitiontime": 10}:
             # set colormode only if new color will be set
             if state.colormode != "":
                 jsonObj["colormode"] = state.colormode
@@ -194,7 +194,7 @@ class Light(DeconzBaseElement):
         if state.brightness == 0:
             jsonObj["on"] = False
             state.on = False
-        if jsonObj != {} #{"transitiontime": 10}:
+        if jsonObj != {}: #{"transitiontime": 10}:
             print(
                 "LIGHT "
                 + str(self.getId())
