@@ -227,6 +227,8 @@ class Router(Singleton):
         for light in alleLights:
             if (
                 light.getType() != "Window covering device"
+                and 
+                light.isReachable()
             ):  # do not switch off curtains
                 light.actionOff()
 

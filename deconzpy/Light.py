@@ -57,6 +57,9 @@ class Light(DeconzBaseElement):
     def isOn(self):
         return self.getAttribute("state_on")
 
+    def isReachable(self):
+        return self.getAttribute("state_reachable")
+
     def setBrightness(self, value, statePrio=10, transitiontime=10):
         newState = self.__getOrAddState(statePrio)
         newState.brightness = value
