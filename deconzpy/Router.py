@@ -306,7 +306,11 @@ class Router(Singleton):
         )
         wso.on_open = self.__ws_on_open
         print("## WS RUN forever ")
-        wso.run_forever()
+        while True: #try reconnect when disconnected
+            try:
+                wso.run_forever()
+            except:
+                time.sleep(30) # don't be agressive in reconnecting
 
     def startAndRunThread(self):
         print("start & run thread")
