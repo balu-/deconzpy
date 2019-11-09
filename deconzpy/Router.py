@@ -310,6 +310,7 @@ class Router(Singleton):
             try:
                 wso.run_forever()
             except:
+                print("Websocket error - reconnect ")
                 time.sleep(30) # don't be agressive in reconnecting
 
     def startAndRunThread(self):
