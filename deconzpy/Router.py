@@ -338,7 +338,7 @@ class Router(Singleton):
             try:
                 wTime = sched.run(blocking=False)
             except Exception as e: 
-                logger.error("Exception in shedule event %s",e)
+                logger.error("Exception in shedule event: %s",e)
             if wTime == None or wTime > maxSleep:
                 wTime = maxSleep
             time.sleep(wTime)
