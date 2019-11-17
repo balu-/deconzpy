@@ -4,6 +4,9 @@
 from .BaseElement import DeconzBaseElement
 import requests
 
+import logging
+logger = logging.getLogger(__name__)
+
 
 class Light(DeconzBaseElement):
     class State:
@@ -64,11 +67,8 @@ class Light(DeconzBaseElement):
         newState = self.__getOrAddState(statePrio)
         newState.brightness = value
         if statePrio >= self.highestStateId:
-            print(
-                "new high prio last:"
-                + str(self.highestStateId)
-                + " new:"
-                + str(statePrio)
+            logger.info(
+                "new high prio last: %s new: %s", str(self.highestStateId), str(statePrio)
             )
             self.__setSate(newState)
 
@@ -80,11 +80,8 @@ class Light(DeconzBaseElement):
         newState.colormode = "ct"
         newState.colorTemperatur = value
         if statePrio >= self.highestStateId:
-            print(
-                "new high prio last:"
-                + str(self.highestStateId)
-                + " new:"
-                + str(statePrio)
+            logger.info(
+                "new high prio last: %s new: %s", str(self.highestStateId), str(statePrio)
             )
             self.__setSate(newState)
 
@@ -108,11 +105,8 @@ class Light(DeconzBaseElement):
             newState.colormode = "ct"
             newState.colorTemperatur = int(colorTemperatur)
         if statePrio >= self.highestStateId:
-            print(
-                "new high prio last:"
-                + str(self.highestStateId)
-                + " new:"
-                + str(statePrio)
+            logger.info(
+                "new high prio last: %s new: %s", str(self.highestStateId), str(statePrio)
             )
             self.__setSate(newState)
 
@@ -141,7 +135,7 @@ class Light(DeconzBaseElement):
         if state.alert != self.stateStack[self.highestStateId].alert:
             jsonObj["alert"] = state.alert
         if jsonObj != {}:
-            print(
+            logger.info(
                 "update state - "
                 + self.getUrlRoot()
                 + "/"
@@ -171,7 +165,7 @@ class Light(DeconzBaseElement):
             if "IKEA" in self.getManufacturer() or "dresden" in self.getManufacturer():
                 if state.on != self.isOn():
                     jsonObj["on"] = state.on
-                print(
+                logger.info(
                     "update state - "
                     + self.getUrlRoot()
                     + "/"
@@ -195,7 +189,7 @@ class Light(DeconzBaseElement):
             jsonObj["on"] = False
             state.on = False
         if jsonObj != {}: #{"transitiontime": 10}:
-            print(
+            logger.info(
                 "LIGHT "
                 + str(self.getId())
                 + " update state - "
@@ -215,7 +209,7 @@ class Light(DeconzBaseElement):
         return prio in self.stateStack
 
     def revokeState(self, prio):
-        print("revoke " + str(prio))
+        logger.info("revoke State: " + str(prio))
         if prio == 0:
             # wont revoke this
             return
@@ -226,7 +220,7 @@ class Light(DeconzBaseElement):
         for prio, state in self.stateStack.items():
             if hId == None or prio > hId:
                 hId = prio
-        print("set State " + str(hId))
+        logger.info("set State " + str(hId))
         # wenn neuer aktueller status dann setzten
         if self.highestStateId != hId:
             self.highestStateId = hId
