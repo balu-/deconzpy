@@ -335,7 +335,10 @@ class Router(Singleton):
         maxSleep = 3
         while True:
             # print("Scheduling thread")
-            wTime = sched.run(blocking=False)
+            try:
+                wTime = sched.run(blocking=False)
+            except Exception as e: 
+                logger.error("Exception in shedule event %s",e)
             if wTime == None or wTime > maxSleep:
                 wTime = maxSleep
             time.sleep(wTime)
