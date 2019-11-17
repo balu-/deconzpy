@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger(__name__)
+
 class BaseElement:
     """
         BaseElement
@@ -65,9 +68,12 @@ class BaseElement:
         for attributeName, value in updatedValues.items():
             if attributeName in self.__subs:
                 for func in self.__subs[attributeName]:
-                    func(
-                        self, attributeName, value, self.__val[attributeName]
-                    )  # obj, key, oldval, newval
+                    try:
+                        func(
+                            self, attributeName, value, self.__val[attributeName]
+                        )  # obj, key, oldval, newval
+                    except:
+                        logger.warning("Exception in subscriber "+str(func))
         # call all subscribers that want to be called weather or not value did change
         for attributeName, value in obj.items():
             if attributeName in self.__subsAllwaysCall:
@@ -76,7 +82,10 @@ class BaseElement:
                     oldvalue = value
                     if attributeName in updatedValues:
                         oldvalue = updatedValues[attributeName]
-                    func(self, attributeName, oldvalue, self.__val[attributeName])
+                    try:
+                        func(self, attributeName, oldvalue, self.__val[attributeName])
+                    except:
+                        logger.warning("Exception in subscriber "+str(func))
 
     def subscribeToAttribute(self, attributeName, func, callOnlyIfValueChanged=True):
         """
