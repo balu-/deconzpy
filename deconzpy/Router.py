@@ -281,9 +281,9 @@ class Router(Singleton):
             logger.info(printString)
         except Exception as error:
             logger.error(type(error).__name__)
-            logger.error(error)
             logger.error("Obj: " + str(obj))
-            traceback.print_exc()
+            logger.error(traceback.format_exc())
+            logger.exception(error)
 
     def __ws_on_error(self, error):
         logger.error("### error ###")
@@ -339,6 +339,7 @@ class Router(Singleton):
                 wTime = sched.run(blocking=False)
             except Exception as e: 
                 logger.error("Exception in shedule event: %s",e)
+                logger.exception(e)
             if wTime == None or wTime > maxSleep:
                 wTime = maxSleep
             time.sleep(wTime)
