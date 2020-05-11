@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from .BaseElement import DeconzBaseElement
+
 import requests
+from .BaseElement import DeconzBaseElement
 
 import logging
 logger = logging.getLogger(__name__)
 
 
 class Light(DeconzBaseElement):
+    """ Repraesentation eines Lichts """
     class State:
+        """ ein Status eines Lichts """
         brightness = 0
         colormode = ""
         colorTemperatur = 0
@@ -31,8 +34,6 @@ class Light(DeconzBaseElement):
         # 		self.sat = prevState.sat
         # 		self.xy = prevState.xy
 
-    """ Repraesentation einer Gruppe """
-
     def __init__(self, id, arr, urlRoot):
         DeconzBaseElement.__init__(self, id, arr, urlRoot)
         self.stateStack = {0: Light.State()}
@@ -40,7 +41,7 @@ class Light(DeconzBaseElement):
 
     def __getOrAddState(self, prio):
         state = None
-        if not prio in self.stateStack:
+        if prio not in self.stateStack:
             # if adding a new higher state
             if prio > self.highestStateId:
                 self.highestStateId = prio
@@ -68,8 +69,8 @@ class Light(DeconzBaseElement):
         newState.brightness = value
         if statePrio >= self.highestStateId:
             logger.info(
-                "new high prio last: %s new: %s", str(self.highestStateId), str(statePrio)
-            )
+                "new high prio last: %s new: %s", str(
+                    self.highestStateId), str(statePrio))
             self.__setSate(newState)
 
     def getBrightness(self):
@@ -81,16 +82,19 @@ class Light(DeconzBaseElement):
         newState.colorTemperatur = value
         if statePrio >= self.highestStateId:
             logger.info(
-                "new high prio last: %s new: %s", str(self.highestStateId), str(statePrio)
-            )
+                "new high prio last: %s new: %s", str(
+                    self.highestStateId), str(statePrio))
             self.__setSate(newState)
 
     def getColorTemeratur(self):
         return self.getAttribute("state_ct")
 
     def actionOn(
-        self, statePrio=10, transitiontime=10, brightness=None, colorTemperatur=None
-    ):
+            self,
+            statePrio=10,
+            transitiontime=10,
+            brightness=None,
+            colorTemperatur=None):
         newState = self.__getOrAddState(statePrio)
         newState.on = True
         if brightness is not None and brightness >= 0 and brightness <= 255:
@@ -106,11 +110,11 @@ class Light(DeconzBaseElement):
             newState.colorTemperatur = int(colorTemperatur)
         if statePrio >= self.highestStateId:
             logger.info(
-                "new high prio last: %s new: %s", str(self.highestStateId), str(statePrio)
-            )
+                "new high prio last: %s new: %s", str(
+                    self.highestStateId), str(statePrio))
             self.__setSate(newState)
 
-    ## switch light off and flush stack
+    # switch light off and flush stack
     def actionOff(self):
         newState = self.__getOrAddState(0)
         newState.on = False
@@ -135,19 +139,12 @@ class Light(DeconzBaseElement):
         if state.alert != self.stateStack[self.highestStateId].alert:
             jsonObj["alert"] = state.alert
         if jsonObj != {}:
-            logger.info(
-                "update state - "
-                + self.getUrlRoot()
-                + "/"
-                + self.getId()
-                + "/state - "
-                + str(jsonObj)
-            )
+            logger.info("update state - %s/%s/state - %s", self.getUrlRoot(), self.getId(), str(jsonObj))
             r = requests.put(
                 self.getUrlRoot() + "/" + self.getId() + "/state", json=jsonObj
             )
-        ##todo check if different from current setting
-        jsonObj = {} #{"transitiontime": 10}
+        # todo check if different from current setting
+        jsonObj = {}  # {"transitiontime": 10}
         if (
             state.colorTemperatur >= 153
             and state.colorTemperatur <= 500
@@ -158,7 +155,7 @@ class Light(DeconzBaseElement):
             jsonObj["hue"] = state.hue
         if state.sat >= 0 and state.sat <= 255:
             jsonObj["sat"] = state.sat
-        if jsonObj != {}: #{"transitiontime": 10}:
+        if jsonObj != {}:  # {"transitiontime": 10}:
             # set colormode only if new color will be set
             if state.colormode != "":
                 jsonObj["colormode"] = state.colormode
@@ -174,13 +171,16 @@ class Light(DeconzBaseElement):
                     + str(jsonObj)
                 )
                 r = requests.put(
-                    self.getUrlRoot() + "/" + self.getId() + "/state", json=jsonObj
-                )
-                jsonObj = {} #{"transitiontime": 10}
+                    self.getUrlRoot() +
+                    "/" +
+                    self.getId() +
+                    "/state",
+                    json=jsonObj)
+                jsonObj = {}  # {"transitiontime": 10}
         if (
-            state.brightness >= 0
-            and state.brightness <= 255
-            and self.getBrightness() != state.brightness
+                state.brightness >= 0
+                and state.brightness <= 255
+                and self.getBrightness() != state.brightness
         ):
             jsonObj["bri"] = state.brightness
         if state.on != self.isOn():
@@ -188,16 +188,9 @@ class Light(DeconzBaseElement):
         if state.brightness == 0:
             jsonObj["on"] = False
             state.on = False
-        if jsonObj != {}: #{"transitiontime": 10}:
+        if jsonObj != {}:  # {"transitiontime": 10}:
             logger.info(
-                "LIGHT "
-                + str(self.getId())
-                + " update state - "
-                + self.getUrlRoot()
-                + "/"
-                + self.getId()
-                + "/state - "
-                + str(jsonObj)
+                "LIGHT %s update state - %s/%s/state - %s", str(self.getId()), self.getUrlRoot(), self.getId(), str(jsonObj)
             )
             r = requests.put(
                 self.getUrlRoot() + "/" + self.getId() + "/state",
@@ -209,7 +202,7 @@ class Light(DeconzBaseElement):
         return prio in self.stateStack
 
     def revokeState(self, prio):
-        logger.info("revoke State: " + str(prio))
+        logger.info("revoke State: %s", str(prio))
         if prio == 0:
             # wont revoke this
             return
@@ -218,9 +211,9 @@ class Light(DeconzBaseElement):
         # find highest prio
         hId = None
         for prio, state in self.stateStack.items():
-            if hId == None or prio > hId:
+            if hId is None or prio > hId:
                 hId = prio
-        logger.info("set State " + str(hId))
+        logger.info("set State %s", str(hId))
         # wenn neuer aktueller status dann setzten
         if self.highestStateId != hId:
             self.highestStateId = hId
@@ -228,11 +221,11 @@ class Light(DeconzBaseElement):
 
     def println(self):
         color = int(self.getId()) % 7
-        print(
-            "\x1b[1;3"
-            + str(color + 1)
-            + ";40m"
-            + "{:2d} : ".format(int(self.getId()))
-            + " {:7.7s} - {:30s}".format(self.getManufacturer(), self.getName()),
-            " - " + self.getType() + "\x1b[0m",
-        )
+        print("\x1b[1;3" +
+              str(color +
+                  1) +
+              ";40m" +
+              "{:2d} : ".format(int(self.getId())) +
+              " {:7.7s} - {:30s}".format(self.getManufacturer(), self.getName()), " - " +
+              self.getType() +
+              "\x1b[0m", )
