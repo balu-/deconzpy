@@ -1,11 +1,22 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import sched
+from threading import Thread
+import traceback
+import time
+import websocket
+from .Light import Light
+from .Group import Group
+from .Sensor import Sensor
+from .Rule import Rule
+from .Config import Config
 import requests
 import json
 
 import logging
 logger = logging.getLogger(__name__)
+
 
 class _Singleton(type):
     """ A metaclass that creates a Singleton base class when called. """
@@ -19,21 +30,23 @@ class _Singleton(type):
 
 
 class Singleton(_Singleton("SingletonMeta", (object,), {})):
+    """ Singelton Class"""
     pass
-
-
-from .Config import Config
 
 
 class RouterConfig(Config):
     """
-        Config for the Router, 
+        Config for the Router,
         mainly just ip of deconz and api token / username
     """
+
     def __init__(self, file):
         Config.__init__(
-            self, file, defaultConfig={"gatewayIP": "1.1.1.1", "username": "user"}
-        )
+            self,
+            file,
+            defaultConfig={
+                "gatewayIP": "1.1.1.1",
+                "username": "user"})
 
     def getApiUrl(self, path):
         return (
@@ -46,28 +59,12 @@ class RouterConfig(Config):
         )
 
 
-from .Rule import Rule
-
-from .Sensor import Sensor
-
-from .Group import Group
-
-from .Light import Light
-
 # imports for ws
-import websocket
-
 # import _thread
-import time
-
 # debugging
-import traceback
-
 # for websocket thread
 # import _thread
 # for scheduler
-import sched, time
-from threading import Thread
 
 # from threading import Thread
 
@@ -84,6 +81,7 @@ class Router(Singleton):
         this might be changed in the future so that its no longer needed)
 
     """
+
     def __init__(self):
         logger.debug("ROUTER: INIT")
         self.__config = RouterConfig("config.json")
@@ -118,7 +116,7 @@ class Router(Singleton):
             return el[0]
         else:
             # maybe lazyload
-            logger.warning("Could not find obj " + key)
+            logger.warning("Could not find obj %s", key)
             return None
 
     def getSensorsByName(self, key):
@@ -127,7 +125,7 @@ class Router(Singleton):
             return el
         else:
             # maybe lazyload
-            logger.warning("Could not find obj " + key)
+            logger.warning("Could not find obj %s", key)
             return None
 
     def getSensorsByIcon(self, icon):
@@ -140,7 +138,7 @@ class Router(Singleton):
             return el[0]
         else:
             # maybe lazyload
-            logger.warning("Could not find obj " + key)
+            logger.warning("Could not find obj %s", key)
             return None
 
     def getRule(self, key):
@@ -149,7 +147,7 @@ class Router(Singleton):
             return el[0]
         else:
             # maybe lazyload
-            logger.warning("Could not find obj " + key)
+            logger.warning("Could not find obj %s", key)
             return None
 
     def getAllLights(self):
@@ -161,7 +159,7 @@ class Router(Singleton):
             return el[0]
         else:
             # maybe lazyload
-            logger.warning("Could not find obj " + key)
+            logger.warning("Could not find obj %s", key)
             return None
 
     def getLightByName(self, key):
@@ -170,7 +168,7 @@ class Router(Singleton):
             return el[0]
         else:
             # maybe lazyload
-            logger.warning("Could not find obj " + key)
+            logger.warning("Could not find obj %s", key)
             return None
 
     def __loadAllGroups(self):
@@ -221,7 +219,7 @@ class Router(Singleton):
         elif urlArray[0] == "rules":
             return self.getRule(urlArray[1])
         else:
-            logger.warning("Could not find obj " + urlArray[0])
+            logger.warning("Could not find obj %s", urlArray[0])
             return None
 
     # schaltet alles aus und räumt den stack auf
@@ -230,14 +228,14 @@ class Router(Singleton):
         for light in alleLights:
             if (
                 light.getType() != "Window covering device"
-                and 
+                and
                 light.isReachable()
             ):  # do not switch off curtains
                 light.actionOff()
 
     def __processChange(self, url, state):
         obj = self.getRessourceFromUrl(url)
-        if obj != None:
+        if obj is not None:
             obj.update(state)
         else:
             logger.warning("obj not found, could not update state")
@@ -272,12 +270,12 @@ class Router(Singleton):
             else:
                 msg += "❔" + obj["e"] + "-"
             msg += url  # lookupAddress(url)
-            printString+=msg
+            printString += msg
             if "state" in obj:
-                printString+="   " + str(obj["state"])
+                printString += "   " + str(obj["state"])
             else:
-                printString+="   " + str(obj)
-            printString+="\x1b[0m"
+                printString += "   " + str(obj)
+            printString += "\x1b[0m"
             logger.info(printString)
         except Exception as error:
             logger.error(type(error).__name__)
@@ -295,12 +293,12 @@ class Router(Singleton):
     def __ws_on_open(self):
         logger.info("### opened ###")
         logger.info(str(self))
-        #print(str(ws))
+        # print(str(ws))
 
     def _ws_thread_entry(self):
         logger.info("## THREAD RUNNING ##")
         websocket.enableTrace(False)
-        #websocket.enableTrace(True)
+        # websocket.enableTrace(True)
         wso = websocket.WebSocketApp(
             "ws://" + self.__config.get("gatewayIP") + ":443",
             on_message=self.__ws_on_message,
@@ -309,12 +307,12 @@ class Router(Singleton):
         )
         wso.on_open = self.__ws_on_open
         logger.info("## WS RUN forever ")
-        while True: #try reconnect when disconnected
+        while True:  # try reconnect when disconnected
             try:
                 wso.run_forever()
-            except:
+            except BaseException:
                 logger.info("Websocket error - reconnect ")
-                time.sleep(30) # don't be agressive in reconnecting
+                time.sleep(30)  # don't be agressive in reconnecting
 
     def startAndRunThread(self):
         logger.info("start & run thread")
@@ -337,9 +335,9 @@ class Router(Singleton):
             # print("Scheduling thread")
             try:
                 wTime = sched.run(blocking=False)
-            except Exception as e: 
-                logger.error("Exception in shedule event: %s",e)
+            except Exception as e:
+                logger.error("Exception in shedule event: %s", e)
                 logger.exception(e)
-            if wTime == None or wTime > maxSleep:
+            if wTime is None or wTime > maxSleep:
                 wTime = maxSleep
             time.sleep(wTime)
