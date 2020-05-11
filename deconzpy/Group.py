@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from .BaseElement import DeconzBaseElement
 import requests
+from .BaseElement import DeconzBaseElement
 
 
 class Scene(DeconzBaseElement):
