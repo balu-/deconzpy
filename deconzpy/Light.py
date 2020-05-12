@@ -89,12 +89,7 @@ class Light(DeconzBaseElement):
     def getColorTemeratur(self):
         return self.getAttribute("state_ct")
 
-    def actionOn(
-            self,
-            statePrio=10,
-            transitiontime=10,
-            brightness=None,
-            colorTemperatur=None):
+    def actionOn(self, statePrio=10, transitiontime=10, brightness=None, colorTemperatur=None):
         newState = self.__getOrAddState(statePrio)
         newState.on = True
         if brightness is not None and brightness >= 0 and brightness <= 255:
