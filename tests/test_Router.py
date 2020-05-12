@@ -25,6 +25,21 @@ class RouterElementTest(unittest.TestCase):
 		r2 = self.getRouter()
 		self.assertEqual(r, r2) #Router is a sigleton and should be the same object always
 
+	def test_Router_getAllGroups(self):
+		r = self.getRouter()
+		self.assertEqual(r.getAllGroups(), []) #elementlists should be empty
+
+	def test_Router_getAllSensors(self):
+		r = self.getRouter()
+		self.assertEqual(r.getAllSensors(), []) #elementlists should be empty
+
+	def test_Router_getAllLights(self):
+		r = self.getRouter()
+		self.assertEqual(r.getAllLights(), []) #elementlists should be empty
+
+
+
+
 
 if __name__ == '__main__':
     unittest.main(warnings='ignore')
