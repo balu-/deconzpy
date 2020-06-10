@@ -49,14 +49,7 @@ class RouterConfig(Config):
                 "username": "user"})
 
     def getApiUrl(self, path):
-        return (
-            "http://"
-            + self.get("gatewayIP")
-            + "/api/"
-            + self.get("username")
-            + "/"
-            + path
-        )
+        return ("http://" + self.get("gatewayIP") + "/api/" + self.get("username") + "/" + path)
 
 
 # imports for ws
@@ -93,6 +86,7 @@ class Router(Singleton):
         self.__loadAllRules()
         self.__lights = []
         self.__loadAllLights()
+        self._t = None # Thread for websocket
 
     def getAllGroups(self):
         return self.__groups
@@ -226,11 +220,8 @@ class Router(Singleton):
     def setOff(self):
         alleLights = self.getAllLights()
         for light in alleLights:
-            if (
-                light.getType() != "Window covering device"
-                and
-                light.isReachable()
-            ):  # do not switch off curtains
+            if (light.getType() != "Window covering device"
+                and light.isReachable()):  # do not switch off curtains
                 light.actionOff()
 
     def __processChange(self, url, state):
@@ -279,7 +270,7 @@ class Router(Singleton):
             logger.info(printString)
         except Exception as error:
             logger.error(type(error).__name__)
-            logger.error("Obj: " + str(obj))
+            logger.error("Obj: %s", str(obj))
             logger.error(traceback.format_exc())
             logger.exception(error)
 
@@ -315,6 +306,8 @@ class Router(Singleton):
                 time.sleep(30)  # don't be agressive in reconnecting
 
     def startAndRunThread(self):
+        """ Start and Run Websocket listener
+           -> processes updates & state changes to the objects living in the router """
         logger.info("start & run thread")
         self._t = Thread(target=self._ws_thread_entry, args=())
         self._t.daemon = True

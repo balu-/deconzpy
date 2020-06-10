@@ -14,7 +14,6 @@ class Light(DeconzBaseElement):
     class State:
         """ ein Status eines Lichts """
         brightness = 0
-        colormode = ""
         colorTemperatur = 0
         hue = -1
         on = False
@@ -78,7 +77,6 @@ class Light(DeconzBaseElement):
 
     def setColorTemperatur(self, value, statePrio=10, transitiontime=10):
         newState = self.__getOrAddState(statePrio)
-        newState.colormode = "ct"
         newState.colorTemperatur = value
         if statePrio >= self.highestStateId:
             logger.info(
@@ -101,7 +99,6 @@ class Light(DeconzBaseElement):
             and colorTemperatur >= 153
             and colorTemperatur <= 500
         ):
-            newState.colormode = "ct"
             newState.colorTemperatur = int(colorTemperatur)
         if statePrio >= self.highestStateId:
             logger.info(
@@ -135,9 +132,9 @@ class Light(DeconzBaseElement):
             jsonObj["alert"] = state.alert
         if jsonObj != {}:
             logger.info("update state - %s/%s/state - %s", self.getUrlRoot(), self.getId(), str(jsonObj))
-            r = requests.put(
-                self.getUrlRoot() + "/" + self.getId() + "/state", json=jsonObj
-            )
+            r = requests.put(self.getUrlRoot() + "/" + self.getId() + "/state",json=jsonObj,timeout=3 )
+            if not r:
+                logger.warn("Some Error in update state: %s",r.text)
         # todo check if different from current setting
         jsonObj = {}  # {"transitiontime": 10}
         if (
@@ -151,32 +148,21 @@ class Light(DeconzBaseElement):
         if state.sat >= 0 and state.sat <= 255:
             jsonObj["sat"] = state.sat
         if jsonObj != {}:  # {"transitiontime": 10}:
-            # set colormode only if new color will be set
-            if state.colormode != "":
-                jsonObj["colormode"] = state.colormode
             if "IKEA" in self.getManufacturer() or "dresden" in self.getManufacturer():
                 if state.on != self.isOn():
-                    jsonObj["on"] = state.on
-                logger.info(
-                    "update state - "
+                    jsonObj["on"] = state.on 
+                logger.info("update state - "
                     + self.getUrlRoot()
                     + "/"
                     + self.getId()
                     + "/state - "
                     + str(jsonObj)
                 )
-                r = requests.put(
-                    self.getUrlRoot() +
-                    "/" +
-                    self.getId() +
-                    "/state",
-                    json=jsonObj)
+                r = requests.put(self.getUrlRoot() + "/" + self.getId() + "/state",json=jsonObj,timeout=3 )
+                if not r:
+                    logger.warn("Some Error in update state: %s",r.text)
                 jsonObj = {}  # {"transitiontime": 10}
-        if (
-                state.brightness >= 0
-                and state.brightness <= 255
-                and self.getBrightness() != state.brightness
-        ):
+        if (state.brightness >= 0 and state.brightness <= 255 and self.getBrightness() != state.brightness):
             jsonObj["bri"] = state.brightness
         if state.on != self.isOn():
             jsonObj["on"] = state.on
@@ -184,14 +170,10 @@ class Light(DeconzBaseElement):
             jsonObj["on"] = False
             state.on = False
         if jsonObj != {}:  # {"transitiontime": 10}:
-            logger.info(
-                "LIGHT %s update state - %s/%s/state - %s", str(self.getId()), self.getUrlRoot(), self.getId(), str(jsonObj)
-            )
-            r = requests.put(
-                self.getUrlRoot() + "/" + self.getId() + "/state",
-                json=jsonObj,
-                timeout=3,
-            )
+            logger.info("LIGHT %s update state - %s/%s/state - %s", str(self.getId()), self.getUrlRoot(), self.getId(), str(jsonObj))
+            r = requests.put(self.getUrlRoot() + "/" + self.getId() + "/state",json=jsonObj,timeout=3 )
+            if not r:
+                logger.warn("Some Error in update state: %s",r.text)
 
     def hasState(self, prio):  # check weather prio is still in stack
         return prio in self.stateStack
