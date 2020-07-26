@@ -19,7 +19,7 @@ class Light(DeconzBaseElement):
         on = None
         sat = -1
         xy = [0, 0]
-        alert = "none"
+        alert = None
 
         def __init__(self, prevState=None):
             pass
@@ -120,6 +120,7 @@ class Light(DeconzBaseElement):
         self.highestStateId = 0
 
     def setAlert(self, statePrio=10, alert="select"):
+        logger.info("LIGHT %s set alert",str(self.getId()))
         newState = self.__getOrAddState(statePrio)
         newState.alert = alert
         self.__setSate(newState)
@@ -128,10 +129,11 @@ class Light(DeconzBaseElement):
         self.setAlert(statePrio=statePrio, alert="none")
 
     def __setSate(self, state):
+        logger.info("LIGHT %s set State.alert = %s vs %s",str(self.getId()), state.alert, self.stateStack[self.highestStateId].alert)
         jsonObj = {}
-        if state.alert != None and state.alert != self.stateStack[self.highestStateId].alert:
+        if state.alert != None: #self.stateStack[self.highestStateId].alert:
             jsonObj["alert"] = state.alert
-            logger.info("update state - %s/%s/state - %s", self.getUrlRoot(), self.getId(), str(jsonObj))
+            logger.info("LIGHT %s update state - %s/%s/state - %s", str(self.getId()), self.getUrlRoot(), self.getId(), str(jsonObj))
             r = requests.put(self.getUrlRoot() + "/" + self.getId() + "/state",json=jsonObj,timeout=3 )
             if not r:
                 logger.warn("Some Error in update state: %s",r.text)
@@ -150,7 +152,7 @@ class Light(DeconzBaseElement):
             if "IKEA" in self.getManufacturer() or "dresden" in self.getManufacturer():
                 if state.on != self.isOn():
                     jsonObj["on"] = state.on 
-                logger.info("update state - %s / %s /state - %s", self.getUrlRoot(), self.getId(), str(jsonObj))
+                logger.info("LIGHT %s update state - %s/%s/state - %s", str(self.getId()), self.getUrlRoot(), self.getId(), str(jsonObj))
                 r = requests.put(self.getUrlRoot() + "/" + self.getId() + "/state",json=jsonObj,timeout=3 )
                 if not r:
                     logger.warn("Some Error in update state: %s",r.text)
@@ -186,6 +188,7 @@ class Light(DeconzBaseElement):
         logger.info("set State %s", str(hId))
         # wenn neuer aktueller status dann setzten
         if self.highestStateId != hId:
+            logger.info("revoke set new State: %s", str(hId))
             self.highestStateId = hId
             self.__setSate(self.stateStack[hId])
 
