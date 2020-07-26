@@ -39,7 +39,7 @@ class LightElementTest(unittest.TestCase):
 
 			l.actionOn(statePrio=10, colorTemperatur=200) #set on 
 			self.assertTrue(l.hasState(10)) #make sure state 10 is there
-			self.assertEqual(l.stateStack[10].brightness, 255)#check if created state has default (max) brightness
+			self.assertEqual(l.stateStack[10].brightness, None)#check if created state has default (None) brightness
 			self.assertEqual(l.stateStack[10].colorTemperatur, 200)#check if created state has correct value
 
 			l.revokeState(10)
