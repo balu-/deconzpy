@@ -16,7 +16,7 @@ class Light(DeconzBaseElement):
         brightness = None
         colorTemperatur = 0
         hue = -1
-        on = False
+        on = None
         sat = -1
         xy = [0, 0]
         alert = "none"
@@ -129,9 +129,8 @@ class Light(DeconzBaseElement):
 
     def __setSate(self, state):
         jsonObj = {}
-        if state.alert != self.stateStack[self.highestStateId].alert:
+        if state.alert != None and state.alert != self.stateStack[self.highestStateId].alert:
             jsonObj["alert"] = state.alert
-        if jsonObj != {}:
             logger.info("update state - %s/%s/state - %s", self.getUrlRoot(), self.getId(), str(jsonObj))
             r = requests.put(self.getUrlRoot() + "/" + self.getId() + "/state",json=jsonObj,timeout=3 )
             if not r:
@@ -158,7 +157,7 @@ class Light(DeconzBaseElement):
         jsonObj = {}  # {"transitiontime": 10}
         if (state.brightness != None and state.brightness >= 0 and state.brightness <= 255 and self.getBrightness() != state.brightness):
             jsonObj["bri"] = state.brightness
-        if state.on != self.isOn():
+        if state.on != None and state.on != self.isOn():
             jsonObj["on"] = state.on
         if state.brightness != None and state.brightness == 0:
             jsonObj["on"] = False
