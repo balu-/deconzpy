@@ -13,7 +13,7 @@ class Light(DeconzBaseElement):
     """ Repraesentation eines Lichts """
     class State:
         """ ein Status eines Lichts """
-        brightness = 0
+        brightness = None
         colorTemperatur = 0
         hue = -1
         on = False
@@ -90,16 +90,17 @@ class Light(DeconzBaseElement):
     def actionOn(self, statePrio=10, transitiontime=10, brightness=None, colorTemperatur=None):
         newState = self.__getOrAddState(statePrio)
         newState.on = True
-        if brightness is not None and brightness >= 0 and brightness <= 255:
-            newState.brightness = int(brightness)
-        else:
-            newState.brightness = 255
-        if (
-            colorTemperatur is not None
-            and colorTemperatur >= 153
-            and colorTemperatur <= 500
-        ):
+        if brightness is not None:
+            if brightness >= 0 and brightness <= 255:
+                newState.brightness = int(brightness)
+            else:
+                newState.brightness = 255
+
+        if ( colorTemperatur is not None
+             and colorTemperatur >= 153
+             and colorTemperatur <= 500 ):
             newState.colorTemperatur = int(colorTemperatur)
+
         if statePrio >= self.highestStateId:
             logger.info(
                 "new high prio last: %s new: %s", str(
@@ -137,12 +138,11 @@ class Light(DeconzBaseElement):
                 logger.warn("Some Error in update state: %s",r.text)
         # todo check if different from current setting
         jsonObj = {}  # {"transitiontime": 10}
-        if (
-            state.colorTemperatur >= 153
-            and state.colorTemperatur <= 500
-            and self.getColorTemeratur() != state.colorTemperatur
-        ):
+        if ( state.colorTemperatur >= 153
+             and state.colorTemperatur <= 500
+             and self.getColorTemeratur() != state.colorTemperatur ):
             jsonObj["ct"] = state.colorTemperatur
+
         if state.hue >= 0 and state.hue <= 65535:
             jsonObj["hue"] = state.hue
         if state.sat >= 0 and state.sat <= 255:
@@ -151,22 +151,16 @@ class Light(DeconzBaseElement):
             if "IKEA" in self.getManufacturer() or "dresden" in self.getManufacturer():
                 if state.on != self.isOn():
                     jsonObj["on"] = state.on 
-                logger.info("update state - "
-                    + self.getUrlRoot()
-                    + "/"
-                    + self.getId()
-                    + "/state - "
-                    + str(jsonObj)
-                )
+                logger.info("update state - %s / %s /state - %s", self.getUrlRoot(), self.getId(), str(jsonObj))
                 r = requests.put(self.getUrlRoot() + "/" + self.getId() + "/state",json=jsonObj,timeout=3 )
                 if not r:
                     logger.warn("Some Error in update state: %s",r.text)
-                jsonObj = {}  # {"transitiontime": 10}
-        if (state.brightness >= 0 and state.brightness <= 255 and self.getBrightness() != state.brightness):
+        jsonObj = {}  # {"transitiontime": 10}
+        if (state.brightness != None and state.brightness >= 0 and state.brightness <= 255 and self.getBrightness() != state.brightness):
             jsonObj["bri"] = state.brightness
         if state.on != self.isOn():
             jsonObj["on"] = state.on
-        if state.brightness == 0:
+        if state.brightness != None and state.brightness == 0:
             jsonObj["on"] = False
             state.on = False
         if jsonObj != {}:  # {"transitiontime": 10}:
