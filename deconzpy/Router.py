@@ -221,6 +221,7 @@ class Router(Singleton):
         alleLights = self.getAllLights()
         for light in alleLights:
             if (light.getType() != "Window covering device"
+                and light.getType() != "Range extender"
                 and light.isReachable()):  # do not switch off curtains
                 light.actionOff()
 
