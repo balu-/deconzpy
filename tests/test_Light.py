@@ -17,6 +17,7 @@ class LightElementTest(unittest.TestCase):
 			l = Light.Light(0, di, 'base/URL') # just create a trash obj
 			self.assertEqual(l.getBrightness(),100) #make sure values of dict are there
 			self.assertTrue(l.hasState(0)) #make sure state 0 is initaly there
+			self.assertEqual(l.isOn(),False) #make sure values of dict are there
 
 	def test_Light_brightness(self):
 		#pass
@@ -44,6 +45,54 @@ class LightElementTest(unittest.TestCase):
 
 			l.revokeState(10)
 			self.assertFalse(l.hasState(10)) #make sure state 10 is there
+
+	def test_Light_ctMax(self):
+		#pass
+		mock = MagicMock(return_value=None)
+		with patch('deconzpy.Light.Light._Light__setSate', mock):
+			di = dict()
+			di['ctmax'] = 400
+			l = Light.Light(0, di, 'base/URL') # just create a trash obj
+
+			l.actionOn(statePrio=10, colorTemperatur=450) #set on 
+			self.assertTrue(l.hasState(10)) #make sure state 10 is there
+			self.assertEqual(l.stateStack[10].colorTemperatur, 400)#check if created state has correct value
+
+			l.revokeState(10)
+			self.assertFalse(l.hasState(10)) #make sure state 10 is there
+
+	def test_Light_ctMin(self):
+		#pass
+		mock = MagicMock(return_value=None)
+		with patch('deconzpy.Light.Light._Light__setSate', mock):
+			di = dict()
+			di['ctmin'] = 300
+			l = Light.Light(0, di, 'base/URL') # just create a trash obj
+
+			l.actionOn(statePrio=10, colorTemperatur=200) #set on 
+			self.assertTrue(l.hasState(10)) #make sure state 10 is there
+			self.assertEqual(l.stateStack[10].colorTemperatur, 300)#check if created state has correct value
+
+			l.revokeState(10)
+			self.assertFalse(l.hasState(10)) #make sure state 10 is there
+
+
+	def test_Light_ctMinMax(self):
+		#pass
+		mock = MagicMock(return_value=None)
+		with patch('deconzpy.Light.Light._Light__setSate', mock):
+			di = dict()
+			di['ctmin'] = 300
+			di['ctmax'] = 400
+			l = Light.Light(0, di, 'base/URL') # just create a trash obj
+
+			l.actionOn(statePrio=10, colorTemperatur=350) #set on 
+			self.assertTrue(l.hasState(10)) #make sure state 10 is there
+			self.assertEqual(l.stateStack[10].colorTemperatur, 350)#check if created state has correct value
+
+			l.revokeState(10)
+			self.assertFalse(l.hasState(10)) #make sure state 10 is there
+
 
 
 

@@ -102,7 +102,15 @@ class Light(DeconzBaseElement):
         if ( colorTemperatur is not None
              and colorTemperatur >= 153
              and colorTemperatur <= 500 ):
-            newState.colorTemperatur = int(colorTemperatur)
+            # check for light specific min max and adapt
+            if (self.getAttribute("ctmax") is not None
+                and colorTemperatur > self.getAttribute("ctmax")):
+                newState.colorTemperatur = self.getAttribute("ctmax")
+            elif (self.getAttribute("ctmin") is not None
+                and colorTemperatur < self.getAttribute("ctmin")):
+                newState.colorTemperatur = self.getAttribute("ctmin")
+            else:
+                newState.colorTemperatur = int(colorTemperatur)
 
         if statePrio >= self.highestStateId:
             logger.info(
