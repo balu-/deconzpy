@@ -16,4 +16,4 @@ class SensorElementTest(unittest.TestCase):
 		di['type'] = "ZHASwitch"
 		l = Sensor.Sensor(0, di, 'base/URL') # just create a trash obj
 		self.assertEqual(l.getName(),"TestSensor") #make sure values of dict are there
-		self.assertEqual(l.getIcon(),"🕹") #make sure values of dict are there
+		self.assertEqual(l.getIcon(),"🕹 ") #make sure values of dict are there
