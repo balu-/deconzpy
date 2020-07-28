@@ -36,6 +36,9 @@ class Light(DeconzBaseElement):
     def __init__(self, id, arr, urlRoot):
         DeconzBaseElement.__init__(self, id, arr, urlRoot)
         self.stateStack = {0: Light.State()}
+        #set defaults
+        self.stateStack[0].brightness = 0 
+        self.stateStack[0].on = False
         self.highestStateId = 0  # highest state id
 
     def __getOrAddState(self, prio):
@@ -120,7 +123,7 @@ class Light(DeconzBaseElement):
         self.highestStateId = 0
 
     def setAlert(self, statePrio=10, alert="select"):
-        logger.info("LIGHT %s set alert",str(self.getId()))
+        logger.info("LIGHT %s set alert", self.getName())
         newState = self.__getOrAddState(statePrio)
         newState.alert = alert
         self.__setSate(newState)
@@ -129,7 +132,6 @@ class Light(DeconzBaseElement):
         self.setAlert(statePrio=statePrio, alert="none")
 
     def __setSate(self, state):
-        logger.info("LIGHT %s set State.alert = %s vs %s",str(self.getId()), state.alert, self.stateStack[self.highestStateId].alert)
         jsonObj = {}
         if state.alert != None: #self.stateStack[self.highestStateId].alert:
             jsonObj["alert"] = state.alert
@@ -168,13 +170,13 @@ class Light(DeconzBaseElement):
             logger.info("LIGHT %s update state - %s/%s/state - %s", str(self.getId()), self.getUrlRoot(), self.getId(), str(jsonObj))
             r = requests.put(self.getUrlRoot() + "/" + self.getId() + "/state",json=jsonObj,timeout=3 )
             if not r:
-                logger.warn("Some Error in update state: %s",r.text)
+                logger.warn("LIGHT %s Some Error in update state: %s", self.getName(), r.text)
 
     def hasState(self, prio):  # check weather prio is still in stack
         return prio in self.stateStack
 
     def revokeState(self, prio):
-        logger.info("revoke State: %s", str(prio))
+        logger.info("%s revoke State: %s", self.getName(), str(prio))
         if prio == 0:
             # wont revoke this
             return
@@ -185,10 +187,9 @@ class Light(DeconzBaseElement):
         for prio, state in self.stateStack.items():
             if hId is None or prio > hId:
                 hId = prio
-        logger.info("set State %s", str(hId))
         # wenn neuer aktueller status dann setzten
         if self.highestStateId != hId:
-            logger.info("revoke set new State: %s", str(hId))
+            logger.info("%s revoke set new State: %s", self.getName(), str(hId))
             self.highestStateId = hId
             self.__setSate(self.stateStack[hId])
 
