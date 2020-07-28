@@ -12,12 +12,11 @@ class LightElementTest(unittest.TestCase):
 		mock = MagicMock(return_value=None)
 		with patch('deconzpy.Light.Light._Light__setSate', mock):
 			di = dict()
-			di['state'] =dict()
+			di['state'] = dict()
 			di['state']['bri'] = 100
 			l = Light.Light(0, di, 'base/URL') # just create a trash obj
 			self.assertEqual(l.getBrightness(),100) #make sure values of dict are there
 			self.assertTrue(l.hasState(0)) #make sure state 0 is initaly there
-			self.assertEqual(l.isOn(),False) #make sure values of dict are there
 
 	def test_Light_brightness(self):
 		#pass
