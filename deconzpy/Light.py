@@ -80,7 +80,18 @@ class Light(DeconzBaseElement):
 
     def setColorTemperatur(self, value, statePrio=10, transitiontime=10):
         newState = self.__getOrAddState(statePrio)
-        newState.colorTemperatur = value
+        if ( value is not None
+             and value >= 153
+             and value <= 500 ):
+            # check for light specific min max and adapt
+            if (self.getAttribute("ctmax") is not None
+                and value > self.getAttribute("ctmax")):
+                newState.colorTemperatur = self.getAttribute("ctmax")
+            elif (self.getAttribute("ctmin") is not None
+                and value < self.getAttribute("ctmin")):
+                newState.colorTemperatur = self.getAttribute("ctmin")
+            else:
+                newState.colorTemperatur = int(value)
         if statePrio >= self.highestStateId:
             logger.info(
                 "new high prio last: %s new: %s", str(
@@ -99,6 +110,7 @@ class Light(DeconzBaseElement):
             else:
                 newState.brightness = 255
 
+        #dublicating code her is not pretty, but i dont see any simple beautifull solution
         if ( colorTemperatur is not None
              and colorTemperatur >= 153
              and colorTemperatur <= 500 ):

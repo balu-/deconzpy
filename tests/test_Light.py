@@ -56,6 +56,14 @@ class LightElementTest(unittest.TestCase):
 			l.actionOn(statePrio=10, colorTemperatur=450) #set on 
 			self.assertTrue(l.hasState(10)) #make sure state 10 is there
 			self.assertEqual(l.stateStack[10].colorTemperatur, 400)#check if created state has correct value
+			
+			l.setColorTemperatur(350, statePrio=10)
+			self.assertTrue(l.hasState(10)) #make sure state 10 is there
+			self.assertEqual(l.stateStack[10].colorTemperatur, 350)#check if created state has correct value
+
+			l.setColorTemperatur(480, statePrio=10)
+			self.assertTrue(l.hasState(10)) #make sure state 10 is there
+			self.assertEqual(l.stateStack[10].colorTemperatur, 400)#check if created state has correct value
 
 			l.revokeState(10)
 			self.assertFalse(l.hasState(10)) #make sure state 10 is there
@@ -69,6 +77,14 @@ class LightElementTest(unittest.TestCase):
 			l = Light.Light(0, di, 'base/URL') # just create a trash obj
 
 			l.actionOn(statePrio=10, colorTemperatur=200) #set on 
+			self.assertTrue(l.hasState(10)) #make sure state 10 is there
+			self.assertEqual(l.stateStack[10].colorTemperatur, 300)#check if created state has correct value
+
+			l.setColorTemperatur(350, statePrio=10)
+			self.assertTrue(l.hasState(10)) #make sure state 10 is there
+			self.assertEqual(l.stateStack[10].colorTemperatur, 350)#check if created state has correct value
+
+			l.setColorTemperatur(220, statePrio=10)
 			self.assertTrue(l.hasState(10)) #make sure state 10 is there
 			self.assertEqual(l.stateStack[10].colorTemperatur, 300)#check if created state has correct value
 
@@ -88,6 +104,19 @@ class LightElementTest(unittest.TestCase):
 			l.actionOn(statePrio=10, colorTemperatur=350) #set on 
 			self.assertTrue(l.hasState(10)) #make sure state 10 is there
 			self.assertEqual(l.stateStack[10].colorTemperatur, 350)#check if created state has correct value
+
+
+			l.setColorTemperatur(200, statePrio=10)
+			self.assertTrue(l.hasState(10)) #make sure state 10 is there
+			self.assertEqual(l.stateStack[10].colorTemperatur, 300)#check if created state has correct value
+
+			l.setColorTemperatur(450, statePrio=10)
+			self.assertTrue(l.hasState(10)) #make sure state 10 is there
+			self.assertEqual(l.stateStack[10].colorTemperatur, 400)#check if created state has correct value
+
+			l.setColorTemperatur(360, statePrio=10)
+			self.assertTrue(l.hasState(10)) #make sure state 10 is there
+			self.assertEqual(l.stateStack[10].colorTemperatur, 360)#check if created state has correct value
 
 			l.revokeState(10)
 			self.assertFalse(l.hasState(10)) #make sure state 10 is there
