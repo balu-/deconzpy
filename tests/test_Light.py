@@ -5,6 +5,11 @@ from unittest.mock import MagicMock
 from deconzpy import Light
 
 
+import logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+
 class LightElementTest(unittest.TestCase):
 
 	def test_Light_init(self):

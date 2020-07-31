@@ -37,8 +37,10 @@ class Light(DeconzBaseElement):
         DeconzBaseElement.__init__(self, id, arr, urlRoot)
         self.stateStack = {0: Light.State()}
         #set defaults
-        self.stateStack[0].brightness = 0 
-        self.stateStack[0].on = False
+        if self.getAttribute("state_bri") != None:
+            self.stateStack[0].brightness = 0 
+        if self.getAttribute("state_on") != None:
+            self.stateStack[0].on = False
         self.highestStateId = 0  # highest state id
 
     def __getOrAddState(self, prio):
@@ -83,6 +85,7 @@ class Light(DeconzBaseElement):
         if ( value is not None
              and value >= 153
              and value <= 500 ):
+            logger.info("ct max %s ct min %s", self.getAttribute("ctmax"), self.getAttribute("ctmin"))
             # check for light specific min max and adapt
             if (self.getAttribute("ctmax") is not None
                 and value > self.getAttribute("ctmax")):
@@ -92,6 +95,8 @@ class Light(DeconzBaseElement):
                 newState.colorTemperatur = self.getAttribute("ctmin")
             else:
                 newState.colorTemperatur = int(value)
+        else:
+            logger.warn("Color Temperatur out of range")
         if statePrio >= self.highestStateId:
             logger.info(
                 "new high prio last: %s new: %s", str(
