@@ -87,6 +87,13 @@ class Router(Singleton):
         self.__lights = []
         self.__loadAllLights()
         self._t = None # Thread for websocket
+        # scheduler
+        self.scheduler = sched.scheduler(time.time, time.sleep)
+        self.__schedulerThread = Thread(
+            target=self.__runScheduler, args=(self.scheduler,)
+        )
+        self.__schedulerThread.daemon = True
+        self.__schedulerThread.start()
 
     def getAllGroups(self):
         return self.__groups
@@ -315,13 +322,6 @@ class Router(Singleton):
         self._t.start()
         # _thread.start_new_thread( self._ws_thread_entry, ("Thread-1", 2, ) )
         # _thread.start_new_thread( self._ws_thread_entry, tuple() )
-        # scheduler
-        self.scheduler = sched.scheduler(time.time, time.sleep)
-        self.__schedulerThread = Thread(
-            target=self.__runScheduler, args=(self.scheduler,)
-        )
-        self.__schedulerThread.daemon = True
-        self.__schedulerThread.start()
 
     def __runScheduler(self, sched):
         maxSleep = 3

@@ -75,8 +75,9 @@ class BaseElement:
                         func(
                             self, attributeName, value, self.__val[attributeName]
                         )  # obj, key, oldval, newval
-                    except BaseException:
+                    except BaseException as e:
                         logger.warning("Exception in subscriber %s",str(func))
+                        logger.warning(e)
         # call all subscribers that want to be called weather or not value did
         # change
         for attributeName, value in obj.items():
@@ -92,8 +93,9 @@ class BaseElement:
                             attributeName,
                             oldvalue,
                             self.__val[attributeName])
-                    except BaseException:
-                        logger.warning("Exception in subscriber %s", str(func))
+                    except BaseException as e:
+                        logger.warning("Exception in subscriber %s",str(func))
+                        logger.warning(e)
 
     def subscribeToAttribute(
             self,
