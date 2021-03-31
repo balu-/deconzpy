@@ -239,7 +239,7 @@ class Router(Singleton):
         else:
             logger.warning("obj not found, could not update state")
 
-    def __ws_on_message(self, message):
+    def __ws_on_message(self, wsapp, message):
         # print(message)
         try:
             obj = json.loads(message)
@@ -282,14 +282,14 @@ class Router(Singleton):
             logger.error(traceback.format_exc())
             logger.exception(error)
 
-    def __ws_on_error(self, error):
+    def __ws_on_error(self,wsapp, error):
         logger.error("### error ###")
         logger.error(error)
 
-    def __ws_on_close(self):
+    def __ws_on_close(self, wsapp):
         logger.info("### closed ###")
 
-    def __ws_on_open(self):
+    def __ws_on_open(self,wsapp):
         logger.info("### opened ###")
         logger.info(str(self))
         # print(str(ws))
