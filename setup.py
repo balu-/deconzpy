@@ -2,7 +2,7 @@
 from setuptools import setup, find_packages
 
 
-__version__ = "0.9.15"
+__version__ = "0.9.16"
 __author__ = "balu-"
 __url__ = "https://github.com/balu-/deconzpy"
 
