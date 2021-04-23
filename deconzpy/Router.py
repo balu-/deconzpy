@@ -253,6 +253,8 @@ class Router(Singleton):
                 # guesswork
                 elif "config" in obj:
                     self.__processChange(url, {"config": obj["config"]})
+                elif "attr" in obj:
+                    self.__processChange(url, obj["attr"])
                 else:
                     logger.warning("dont know what to do")
                     logger.warning(obj)
