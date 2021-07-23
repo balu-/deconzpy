@@ -3,10 +3,8 @@
 
 from .BaseElement import DeconzBaseElement
 
-
 class Rule(DeconzBaseElement):
     """ Class representing a Rule """
-
     class Condition:
         def __init__(self, arr, lookupAddrFunction=lambda adrStr: adrStr):
             self.__val = arr
@@ -77,11 +75,8 @@ class Rule(DeconzBaseElement):
     def println(self):
         color = int(self.getId()) % 7
         print(
-            "\x1b[1;3"
-            + str(color + 1)
-            + ";40m"
-            + "{:2d} : ".format(int(self.getId()))
-            + "{:30.30s}".format(self.getName())
+            "\x1b[1;3" + str(color + 1) + ";40m" + "{:2d} : ".format(int(self.getId())) +
+            "{:30.30s}".format(self.getName())
         )
         for c in self.getConditions():
             print("   + ", end="")

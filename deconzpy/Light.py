@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-
 import requests
 from .BaseElement import DeconzBaseElement
 
 import logging
-logger = logging.getLogger(__name__)
 
+logger = logging.getLogger(__name__)
 
 class Light(DeconzBaseElement):
     """ Repraesentation eines Lichts """
@@ -38,7 +37,7 @@ class Light(DeconzBaseElement):
         self.stateStack = {0: Light.State()}
         #set defaults
         if self.getAttribute("state_bri") != None:
-            self.stateStack[0].brightness = 0 
+            self.stateStack[0].brightness = 0
         if self.getAttribute("state_on") != None:
             self.stateStack[0].on = False
         self.highestStateId = 0  # highest state id
@@ -72,9 +71,7 @@ class Light(DeconzBaseElement):
         newState = self.__getOrAddState(statePrio)
         newState.brightness = value
         if statePrio >= self.highestStateId:
-            logger.info(
-                "new high prio last: %s new: %s", str(
-                    self.highestStateId), str(statePrio))
+            logger.info("new high prio last: %s new: %s", str(self.highestStateId), str(statePrio))
             self.__setSate(newState)
 
     def getBrightness(self):
@@ -82,25 +79,19 @@ class Light(DeconzBaseElement):
 
     def setColorTemperatur(self, value, statePrio=10, transitiontime=10):
         newState = self.__getOrAddState(statePrio)
-        if ( value is not None
-             and value >= 153
-             and value <= 500 ):
+        if (value is not None and value >= 153 and value <= 500):
             logger.info("ct max %s ct min %s", self.getAttribute("ctmax"), self.getAttribute("ctmin"))
             # check for light specific min max and adapt
-            if (self.getAttribute("ctmax") is not None
-                and value > self.getAttribute("ctmax")):
+            if (self.getAttribute("ctmax") is not None and value > self.getAttribute("ctmax")):
                 newState.colorTemperatur = self.getAttribute("ctmax")
-            elif (self.getAttribute("ctmin") is not None
-                and value < self.getAttribute("ctmin")):
+            elif (self.getAttribute("ctmin") is not None and value < self.getAttribute("ctmin")):
                 newState.colorTemperatur = self.getAttribute("ctmin")
             else:
                 newState.colorTemperatur = int(value)
         else:
             logger.warn("Color Temperatur out of range")
         if statePrio >= self.highestStateId:
-            logger.info(
-                "new high prio last: %s new: %s", str(
-                    self.highestStateId), str(statePrio))
+            logger.info("new high prio last: %s new: %s", str(self.highestStateId), str(statePrio))
             self.__setSate(newState)
 
     def getColorTemeratur(self):
@@ -116,23 +107,17 @@ class Light(DeconzBaseElement):
                 newState.brightness = 255
 
         #dublicating code her is not pretty, but i dont see any simple beautifull solution
-        if ( colorTemperatur is not None
-             and colorTemperatur >= 153
-             and colorTemperatur <= 500 ):
+        if (colorTemperatur is not None and colorTemperatur >= 153 and colorTemperatur <= 500):
             # check for light specific min max and adapt
-            if (self.getAttribute("ctmax") is not None
-                and colorTemperatur > self.getAttribute("ctmax")):
+            if (self.getAttribute("ctmax") is not None and colorTemperatur > self.getAttribute("ctmax")):
                 newState.colorTemperatur = self.getAttribute("ctmax")
-            elif (self.getAttribute("ctmin") is not None
-                and colorTemperatur < self.getAttribute("ctmin")):
+            elif (self.getAttribute("ctmin") is not None and colorTemperatur < self.getAttribute("ctmin")):
                 newState.colorTemperatur = self.getAttribute("ctmin")
             else:
                 newState.colorTemperatur = int(colorTemperatur)
 
         if statePrio >= self.highestStateId:
-            logger.info(
-                "new high prio last: %s new: %s", str(
-                    self.highestStateId), str(statePrio))
+            logger.info("new high prio last: %s new: %s", str(self.highestStateId), str(statePrio))
             self.__setSate(newState)
 
     # switch light off and flush stack
@@ -158,17 +143,21 @@ class Light(DeconzBaseElement):
 
     def __setSate(self, state):
         jsonObj = {}
-        if state.alert != None: #self.stateStack[self.highestStateId].alert:
+        if state.alert != None:  #self.stateStack[self.highestStateId].alert:
             jsonObj["alert"] = state.alert
-            logger.info("LIGHT %s update state - %s/%s/state - %s", str(self.getId()), self.getUrlRoot(), self.getId(), str(jsonObj))
-            r = requests.put(self.getUrlRoot() + "/" + self.getId() + "/state",json=jsonObj,timeout=3 )
+            logger.info(
+                "LIGHT %s update state - %s/%s/state - %s", str(self.getId()), self.getUrlRoot(), self.getId(),
+                str(jsonObj)
+            )
+            r = requests.put(self.getUrlRoot() + "/" + self.getId() + "/state", json=jsonObj, timeout=3)
             if not r:
-                logger.warn("Some Error in update state: %s",r.text)
+                logger.warn("Some Error in update state: %s", r.text)
         # todo check if different from current setting
         jsonObj = {}  # {"transitiontime": 10}
-        if ( state.colorTemperatur >= 153
-             and state.colorTemperatur <= 500
-             and self.getColorTemeratur() != state.colorTemperatur ):
+        if (
+            state.colorTemperatur >= 153 and state.colorTemperatur <= 500
+            and self.getColorTemeratur() != state.colorTemperatur
+        ):
             jsonObj["ct"] = state.colorTemperatur
 
         if state.hue >= 0 and state.hue <= 65535:
@@ -178,13 +167,19 @@ class Light(DeconzBaseElement):
         if jsonObj != {}:  # {"transitiontime": 10}:
             if "IKEA" in self.getManufacturer() or "dresden" in self.getManufacturer():
                 if state.on != self.isOn():
-                    jsonObj["on"] = state.on 
-                logger.info("LIGHT %s update state - %s/%s/state - %s", str(self.getId()), self.getUrlRoot(), self.getId(), str(jsonObj))
-                r = requests.put(self.getUrlRoot() + "/" + self.getId() + "/state",json=jsonObj,timeout=3 )
+                    jsonObj["on"] = state.on
+                logger.info(
+                    "LIGHT %s update state - %s/%s/state - %s", str(self.getId()), self.getUrlRoot(), self.getId(),
+                    str(jsonObj)
+                )
+                r = requests.put(self.getUrlRoot() + "/" + self.getId() + "/state", json=jsonObj, timeout=3)
                 if not r:
-                    logger.warn("Some Error in update state: %s",r.text)
+                    logger.warn("Some Error in update state: %s", r.text)
         jsonObj = {}  # {"transitiontime": 10}
-        if (state.brightness != None and state.brightness >= 0 and state.brightness <= 255 and self.getBrightness() != state.brightness):
+        if (
+            state.brightness != None and state.brightness >= 0 and state.brightness <= 255
+            and self.getBrightness() != state.brightness
+        ):
             jsonObj["bri"] = state.brightness
         if state.on != None and state.on != self.isOn():
             jsonObj["on"] = state.on
@@ -192,8 +187,11 @@ class Light(DeconzBaseElement):
             jsonObj["on"] = False
             state.on = False
         if jsonObj != {}:  # {"transitiontime": 10}:
-            logger.info("LIGHT %s update state - %s/%s/state - %s", str(self.getId()), self.getUrlRoot(), self.getId(), str(jsonObj))
-            r = requests.put(self.getUrlRoot() + "/" + self.getId() + "/state",json=jsonObj,timeout=3 )
+            logger.info(
+                "LIGHT %s update state - %s/%s/state - %s", str(self.getId()), self.getUrlRoot(), self.getId(),
+                str(jsonObj)
+            )
+            r = requests.put(self.getUrlRoot() + "/" + self.getId() + "/state", json=jsonObj, timeout=3)
             if not r:
                 logger.warn("LIGHT %s Some Error in update state: %s", self.getName(), r.text)
 
@@ -220,11 +218,8 @@ class Light(DeconzBaseElement):
 
     def println(self):
         color = int(self.getId()) % 7
-        print("\x1b[1;3" +
-              str(color +
-                  1) +
-              ";40m" +
-              "{:2d} : ".format(int(self.getId())) +
-              " {:7.7s} - {:30s}".format(self.getManufacturer(), self.getName()), " - " +
-              self.getType() +
-              "\x1b[0m", )
+        print(
+            "\x1b[1;3" + str(color + 1) + ";40m" + "{:2d} : ".format(int(self.getId())) +
+            " {:7.7s} - {:30s}".format(self.getManufacturer(), self.getName()),
+            " - " + self.getType() + "\x1b[0m",
+        )

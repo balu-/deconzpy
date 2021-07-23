@@ -1,6 +1,5 @@
 import json
 
-
 class Config:
     # config
     def __init__(self, file, defaultConfig={}):

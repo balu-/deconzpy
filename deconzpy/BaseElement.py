@@ -1,6 +1,6 @@
 import logging
-logger = logging.getLogger(__name__)
 
+logger = logging.getLogger(__name__)
 
 class BaseElement:
     """
@@ -15,7 +15,6 @@ class BaseElement:
                         internaly this dict will be converted to a dict of depth=1 (like { "key_key1": "value"})
                         [this is done to be easily able to subscribe to changes]
     """
-
     def __init__(self, id, arr):
         arr = self.__flatDict(arr)
         self.__val = arr
@@ -72,11 +71,9 @@ class BaseElement:
             if attributeName in self.__subs:
                 for func in self.__subs[attributeName]:
                     try:
-                        func(
-                            self, attributeName, value, self.__val[attributeName]
-                        )  # obj, key, oldval, newval
+                        func(self, attributeName, value, self.__val[attributeName])  # obj, key, oldval, newval
                     except BaseException as e:
-                        logger.warning("Exception in subscriber %s",str(func))
+                        logger.warning("Exception in subscriber %s", str(func))
                         logger.warning(e)
         # call all subscribers that want to be called weather or not value did
         # change
@@ -88,20 +85,12 @@ class BaseElement:
                     if attributeName in updatedValues:
                         oldvalue = updatedValues[attributeName]
                     try:
-                        func(
-                            self,
-                            attributeName,
-                            oldvalue,
-                            self.__val[attributeName])
+                        func(self, attributeName, oldvalue, self.__val[attributeName])
                     except BaseException as e:
-                        logger.warning("Exception in subscriber %s",str(func))
+                        logger.warning("Exception in subscriber %s", str(func))
                         logger.warning(e)
 
-    def subscribeToAttribute(
-            self,
-            attributeName,
-            func,
-            callOnlyIfValueChanged=True):
+    def subscribeToAttribute(self, attributeName, func, callOnlyIfValueChanged=True):
         """
             Add subscriber for changes to an attribute
 
@@ -161,7 +150,6 @@ class BaseElement:
     def dump(self):
         print(self.getId() + " - " + str(self.__val))
 
-
 class DeconzBaseElement(BaseElement):
     """
         DeconzBaseElement
@@ -169,7 +157,6 @@ class DeconzBaseElement(BaseElement):
         adds urlRoot to the BaseElement
         (urlRoot will be populated by the router on creation)
     """
-
     def __init__(self, id, arr, urlRoot):
         self.__urlRoot = urlRoot
         BaseElement.__init__(self, id, arr)

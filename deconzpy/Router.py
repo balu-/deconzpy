@@ -15,8 +15,8 @@ import requests
 import json
 
 import logging
-logger = logging.getLogger(__name__)
 
+logger = logging.getLogger(__name__)
 
 class _Singleton(type):
     """ A metaclass that creates a Singleton base class when called. """
@@ -28,29 +28,20 @@ class _Singleton(type):
             cls._instances[cls] = super(_Singleton, cls).__call__(*args, **kwargs)
         return cls._instances[cls]
 
-
-class Singleton(_Singleton("SingletonMeta", (object,), {})):
+class Singleton(_Singleton("SingletonMeta", (object, ), {})):
     """ Singelton Class"""
     pass
-
 
 class RouterConfig(Config):
     """
         Config for the Router,
         mainly just ip of deconz and api token / username
     """
-
     def __init__(self, file):
-        Config.__init__(
-            self,
-            file,
-            defaultConfig={
-                "gatewayIP": "1.1.1.1",
-                "username": "user"})
+        Config.__init__(self, file, defaultConfig={"gatewayIP": "1.1.1.1", "username": "user"})
 
     def getApiUrl(self, path):
         return ("http://" + self.get("gatewayIP") + "/api/" + self.get("username") + "/" + path)
-
 
 # imports for ws
 # import _thread
@@ -60,7 +51,6 @@ class RouterConfig(Config):
 # for scheduler
 
 # from threading import Thread
-
 
 class Router(Singleton):
     """ Router
@@ -74,7 +64,6 @@ class Router(Singleton):
         this might be changed in the future so that its no longer needed)
 
     """
-
     def __init__(self):
         logger.debug("ROUTER: INIT")
         self.__config = RouterConfig("config.json")
@@ -86,12 +75,10 @@ class Router(Singleton):
         self.__loadAllRules()
         self.__lights = []
         self.__loadAllLights()
-        self._t = None # Thread for websocket
+        self._t = None  # Thread for websocket
         # scheduler
         self.scheduler = sched.scheduler(time.time, time.sleep)
-        self.__schedulerThread = Thread(
-            target=self.__runScheduler, args=(self.scheduler,)
-        )
+        self.__schedulerThread = Thread(target=self.__runScheduler, args=(self.scheduler, ))
         self.__schedulerThread.daemon = True
         self.__schedulerThread.start()
 
@@ -227,9 +214,10 @@ class Router(Singleton):
     def setOff(self):
         alleLights = self.getAllLights()
         for light in alleLights:
-            if (light.getType() != "Window covering device"
-                and light.getType() != "Range extender"
-                and light.isReachable()):  # do not switch off curtains
+            if (
+                light.getType() != "Window covering device" and light.getType() != "Range extender"
+                and light.isReachable()
+            ):  # do not switch off curtains
                 light.actionOff()
 
     def __processChange(self, url, state):
@@ -284,14 +272,14 @@ class Router(Singleton):
             logger.error(traceback.format_exc())
             logger.exception(error)
 
-    def __ws_on_error(self,wsapp, error):
+    def __ws_on_error(self, wsapp, error):
         logger.error("### error ###")
         logger.error(error)
 
     def __ws_on_close(self, wsapp):
         logger.info("### closed ###")
 
-    def __ws_on_open(self,wsapp):
+    def __ws_on_open(self, wsapp):
         logger.info("### opened ###")
         logger.info(str(self))
         # print(str(ws))
