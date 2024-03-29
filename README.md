@@ -1,3 +1,6 @@
+!! Archived !!
+I moved to zigbee2mqtt
+
 # deconzpy
 [![Build Status](https://travis-ci.org/balu-/deconzpy.svg?branch=master)](https://travis-ci.org/balu-/deconzpy)
 [![Coverage Status](https://coveralls.io/repos/github/balu-/deconzpy/badge.svg?branch=master)](https://coveralls.io/github/balu-/deconzpy?branch=master)
